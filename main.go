@@ -33,32 +33,31 @@ Don't panic.`
 	proverbios := strings.Split(prov, "\n")
 	limite := len(proverbios)
 	palabraPtr := flag.String("f", "", "palabra de búsqueda")
-	arg := os.Args
 
-	if len(arg) < 2 {
+	if len(os.Args) < 2 {
 		return
-	}
-	i, err := strconv.Atoi(arg[1])
-	if err != nil {
-		fmt.Println(err)
+	} else if len(os.Args) == 2 && (os.Args[1] != "-f") {
+		i, err := strconv.Atoi(os.Args[1])
+		if err != nil {
+			fmt.Println("Argumento no numérico.")
+			return
+		} else if i < 0 {
+			i = -i
+		}
+
+		if i != 0 && i <= limite {
+			fmt.Printf("Proverbio #%d\t--> %s\n", i, proverbios[i-1])
+			return
+		} else if i > limite || i == 0 {
+			fmt.Printf("El número de proverbio debe estar enre 1 y %d ó entre -1 y -%d.", limite, limite)
+			return
+		}
+	} else {
 		flag.Parse()
 		indexes := indsearch.Search(*palabraPtr, proverbios)
 		for _, v := range indexes {
 			fmt.Printf("Proverbio #%d\t%s\n", v+1, proverbios[v])
 		}
 		return
-		/* if i == 0 {
-			fmt.Println("Argumento no numérico.")
-			return
-		} */
-	}
-	if i < 0 {
-		i = -i
-	}
-
-	if i != 0 && i <= limite {
-		fmt.Printf("Proverbio #%d\t--> %s\n", i, proverbios[i-1])
-	} else if i > limite || i == 0 {
-		fmt.Printf("El número de proverbio debe estar enre 1 y %d ó entre -1 y -%d.", limite, limite)
 	}
 }
