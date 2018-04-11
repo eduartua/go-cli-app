@@ -21,7 +21,7 @@ func main() {
 	proverbs, err := ioutil.ReadFile("./proverbs.txt")
 	check(err)
 	ps := strings.Split(string(proverbs), "\n")
-	limite := len(ps)
+	limite := len(ps) - 1
 	palabraPtr := flag.String("f", "", "palabra de búsqueda")
 
 	if len(os.Args) < 2 {
