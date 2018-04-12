@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -20,11 +19,11 @@ func check(e error) {
 }
 
 func printProv(i int, ps []string) {
-	limite := len(ps) - 1
+	limite := len(ps)
 	if i != 0 && i <= limite {
-		fmt.Printf("Proverbio #%d\t--> %s\n", i, ps[i-1])
+		fmt.Printf("#%d\t--> %s\n", i, ps[i-1])
 	} else if i > limite || i == 0 {
-		fmt.Printf("El número de proverbio debe estar enre 1 y %d ó entre -1 y -%d.", limite, limite)
+		fmt.Printf("El número debe estar enre 1 y %d.", limite)
 	}
 	return
 }
@@ -38,44 +37,48 @@ func checkFlag(s string, xs []string) bool {
 	return false
 }
 
-//Config configs the writing to a file
-type Config struct{ outfile io.Writer }
-
 func main() {
+	if len(os.Args) < 2 {
+		return
+	}
+
 	path := env.CheckPath()
 	proverbs, err := ioutil.ReadFile(path)
 	check(err)
 	ps := strings.Split(string(proverbs), "\n")
-	outPtr := flag.String("o", "path", "PATH al cuál debería ser escrito el archivo")
 	findPtr := flag.String("f", "find", "palabra de búsqueda")
+	outPtr := flag.String("o", "path", "PATH al cuál debería ser escrito el archivo")
 	flag.Parse()
 
-	//cfg := Config{outfile: os.Stdout}
-
-	if len(os.Args) < 2 {
-		return
-	}
-	if os.Args[1] == "env" {
+	if checkFlag("env", os.Args) {
 		env.ListVars()
 		return
 	}
-	if os.Args[1] == "list" {
-		if checkFlag("-o", os.Args) {
-			f, err := os.Create(*outPtr)
-			check(err)
-			defer f.Close()
+	if checkFlag("-o", os.Args) {
+		f, err := os.Create(*outPtr)
+		check(err)
+		defer f.Close()
+		if checkFlag("list", os.Args) {
 			for _, v := range ps {
 				_, err = f.Write([]byte(v + "\n"))
 				check(err)
 			}
 			return
 		}
+		if checkFlag("-f", os.Args) {
+			indexes := search.Search(*findPtr, ps)
+			for _, v := range indexes {
+				_, err = f.Write([]byte(ps[v] + "\n"))
+			}
+			return
+		}
+		return
+	}
+	if checkFlag("list", os.Args) {
 		search.PrintAll(ps)
 		return
 	}
-	if len(os.Args) != 2 || (os.Args[1] == "-f") {
-		fmt.Println(os.Args)
-		//flag.Parse()
+	if checkFlag("-f", os.Args) {
 		indexes := search.Search(*findPtr, ps)
 		for _, v := range indexes {
 			fmt.Printf("Proverbio #%d\t%s\n", v+1, ps[v])
