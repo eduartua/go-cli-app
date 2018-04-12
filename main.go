@@ -60,7 +60,7 @@ func main() {
 		return
 	}
 	if os.Args[1] == "list" {
-		if checkFlag(os.Args[2], os.Args) {
+		if checkFlag("-o", os.Args) {
 			f, err := os.Create(*outPtr)
 			check(err)
 			defer f.Close()
