@@ -1,6 +1,7 @@
-package indsearch
+package search
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -15,4 +16,11 @@ func Search(w string, s []string) []int {
 		}
 	}
 	return ans
+}
+
+//PrintAll prints all proverbs within the file.
+func PrintAll(s []string) {
+	for _, v := range s {
+		fmt.Println(v)
+	}
 }
